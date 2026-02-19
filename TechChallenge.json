@@ -1,0 +1,747 @@
+{
+  "name": "TechChallenge",
+  "nodes": [
+    {
+      "parameters": {
+        "maxItems": "={{ $('Files/Batch Settings').item.json.total_files }}",
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "f48316da-08a2-420d-a874-ba0b090df80b",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "bucketName": "intelli-extract-tech-challenge-891377258245",
+        "fileKey": "={{$json.Key}}"
+      },
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "03d4a49e-999e-47f3-8d58-f5c741b0bde5",
+      "name": "Download a file",
+      "alwaysOutputData": false,
+      "credentials": {
+        "aws": {
+          "id": "voW30TKGamq5VZm8",
+          "name": "AWS account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1598d2cc-f2cf-4178-a9e4-a16f6783116e",
+              "name": "startTime",
+              "value": "={{ Date.now() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "20449095-d038-4a7b-b360-f1f57cb5eb7f",
+      "name": "httpStartTime"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://vcex9tits4.us-west-2.awsapprunner.com/api/v1/spreadsheet/extract/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Access-Key",
+              "value": "eyJ0ZW5hbnRfaWQiOiJGR0gifQ.IEkoQuhT2L7CZsX9Bh-Jmw"
+            },
+            {
+              "name": "X-Signature",
+              "value": "492ab8a3f524635cc462b239bf37b171c328ec9abbef5585a8226bab53454b95"
+            },
+            {
+              "name": "X-Secret-Message",
+              "value": "SUNDIA ALPHA Environment IDP"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "request_metadata",
+              "value": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "6d6f5e00-c008-46db-8aa3-86e4b17f4ad2",
+      "name": "HTTP Request",
+      "executeOnce": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.request_metadata = JSON.parse(item.json.request_metadata);\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "5987ba9a-f817-43d3-a179-d5520b06a0d5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        0
+      ],
+      "id": "5b1a2707-b2c3-41ee-a26e-b4d4e26074e6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "sendTo": "bitank@intellirevenue.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{$json.body}}",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        304
+      ],
+      "id": "c8672ef9-bd97-4deb-aa16-22531359e904",
+      "name": "Send a message",
+      "webhookId": "9cda864d-4634-4265-bddc-9c8c731f9a8f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "R8ozpvSRbXNET50g",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Key": "={{ $json.request_metadata.Key }}",
+            "status": "={{ $json.success === false ? \"FAILED\" : \"SUCCESS\" }}",
+            "ETag": "={{ $json.request_metadata.ETag }}",
+            "completed": "={{ new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) }}",
+            "latencyMs": "={{ (Date.now() - $json.request_metadata.startTime) }}"
+          },
+          "matchingColumns": [
+            "Key"
+          ],
+          "schema": [
+            {
+              "id": "Key",
+              "displayName": "Key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LastModified",
+              "displayName": "LastModified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ETag",
+              "displayName": "ETag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ChecksumAlgorithm",
+              "displayName": "ChecksumAlgorithm",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ChecksumType",
+              "displayName": "ChecksumType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Size",
+              "displayName": "Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "StorageClass",
+              "displayName": "StorageClass",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "completed",
+              "displayName": "completed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "latencyMs",
+              "displayName": "latencyMs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        -16
+      ],
+      "id": "952b35e6-4d07-4375-8003-14173f744fc9",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4Z2hQ6PO2DVQh5Zp",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "bucket",
+        "operation": "search",
+        "bucketName": "intelli-extract-tech-challenge-891377258245",
+        "returnAll": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.awsS3",
+      "typeVersion": 2,
+      "position": [
+        -864,
+        -304
+      ],
+      "id": "eed17f49-eaca-450d-9fe9-451712b700b1",
+      "name": "Search a bucket1",
+      "credentials": {
+        "aws": {
+          "id": "voW30TKGamq5VZm8",
+          "name": "AWS account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1migwABLfhkbIk04lngAMoDzeNCBAl3iAAsn9UZpKSKM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ETag": "={{ $json.ETag }}",
+            "fileKey": "={{ $json.Key }}",
+            "timestamp": "={{ new Date() }}"
+          },
+          "matchingColumns": [
+            "ETag"
+          ],
+          "schema": [
+            {
+              "id": "fileKey",
+              "displayName": "fileKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "latencyMs",
+              "displayName": "latencyMs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ETag",
+              "displayName": "ETag",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -544,
+        -304
+      ],
+      "id": "4b88d707-c6a6-4a7a-9a45-4d8cbd23a05b",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4Z2hQ6PO2DVQh5Zp",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"total_files\": 15,\n  \"runs_on_batch\": 5\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        0
+      ],
+      "id": "61c74583-19f4-4462-ae95-34e841da371d",
+      "name": "Files/Batch Settings"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -816,
+        0
+      ],
+      "id": "3f8fc602-6f41-446b-89fd-7740183492a9",
+      "name": "Get row(s) from sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4Z2hQ6PO2DVQh5Zp",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all rows\nconst rows = $input.all();\n\n// Return only rows where completed is empty\nreturn rows.filter(item => {\n\n  const completed = item.json.completed;\n\n  return (\n    completed === undefined ||\n    completed === null ||\n    completed === \"\" ||\n    completed === 0\n  );\n\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        0
+      ],
+      "id": "aeed65c4-0ed6-473f-8033-0c94921565e4",
+      "name": "Condition check-JavaScript2",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oMymO-JWBiV90ltw0bF_nwqJN_cyLZ1emxAIi3GNQj4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -512,
+        304
+      ],
+      "id": "c965bc60-43b5-423c-8ec1-066a11a0c126",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4Z2hQ6PO2DVQh5Zp",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==========================================\n// GET ALL INPUT ITEMS\n// ==========================================\n\nconst logs = $input.all();\n\n// ==========================================\n// REMOVE DUPLICATES USING Key\n// ==========================================\n\nconst uniqueMap = new Map();\n\nfor (const item of logs) {\n  const Key = item.json?.Key;\n  if (Key && typeof Key === \"string\") {\n    uniqueMap.set(Key, item.json);\n  }\n}\n\nconst uniqueLogs = Array.from(uniqueMap.values());\n\n// ==========================================\n// METRICS (ALL FILES)\n// ==========================================\n\nconst totalFiles = uniqueLogs.length;\n\nconst successCount =\n  uniqueLogs.filter(f => f.status === \"SUCCESS\").length;\n\nconst failureCount =\n  uniqueLogs.filter(f => f.status === \"FAILED\").length;\n\nconst yettobeProcessed =\n  uniqueLogs.filter(f =>\n    !f.status || String(f.status).trim() === \"\"\n  ).length;\n\n// ==========================================\n// PROCESSED FILES ONLY (IMPORTANT)\n// ==========================================\n\nconst processedLogs =\n  uniqueLogs.filter(f =>\n    (f.status === \"SUCCESS\" || f.status === \"FAILED\") &&\n    f.latencyMs !== undefined &&\n    f.latencyMs !== null &&\n    f.latencyMs !== \"\" &&\n    !isNaN(Number(f.latencyMs))\n  );\n\n// ==========================================\n// LATENCY (ONLY PROCESSED FILES)\n// ==========================================\n\nconst latencies =\n  processedLogs\n    .map(f => Number(f.latencyMs))\n    .sort((a, b) => a - b);\n\nconst avgLatencyMs =\n  latencies.length\n    ? latencies.reduce((a, b) => a + b, 0) / latencies.length\n    : 0;\n\nconst p95LatencyMs =\n  latencies.length >= 2\n    ? latencies[Math.floor((latencies.length - 1) * 0.95)]\n    : latencies.length === 1\n      ? latencies[0]\n      : 0;\n\n// ==========================================\n// RUN DURATION (BASED ON COMPLETED TIME)\n// ==========================================\n\nfunction parseIndiaTime(str) {\n  if (!str || typeof str !== \"string\") return null;\n\n  const parsed = Date.parse(str);\n  if (!isNaN(parsed)) return parsed;\n\n  try {\n    const [datePart, timePart] = str.split(\",\");\n    if (!datePart || !timePart) return null;\n\n    const [day, month, year] = datePart.trim().split(\"/\");\n    const rebuilt =\n      `${year}-${month.padStart(2, \"0\")}-${day.padStart(2, \"0\")} ${timePart.trim()}`;\n\n    const retry = Date.parse(rebuilt);\n    return isNaN(retry) ? null : retry;\n  } catch {\n    return null;\n  }\n}\n\nconst completedTimes =\n  processedLogs\n    .map(f => parseIndiaTime(f.completed))\n    .filter(v => v !== null);\n\nlet runDurationMs = 0;\n\nif (completedTimes.length >= 2) {\n  runDurationMs =\n    Math.max(...completedTimes) -\n    Math.min(...completedTimes);\n} else if (latencies.length) {\n  runDurationMs = Math.max(...latencies);\n} else {\n  runDurationMs = 0;\n}\n\n// ==========================================\n// THROUGHPUT (FILES / MIN)\n// ==========================================\n\nconst throughputPerMinute =\n  runDurationMs > 0\n    ? Math.round((processedLogs.length / runDurationMs) * 60000)\n    : 0;\n\n// ==========================================\n// SLOWEST FILES (TOP 5)\n// ==========================================\n\nconst slowestFiles =\n  [...processedLogs]\n    .sort((a, b) =>\n      Number(b.latencyMs) - Number(a.latencyMs)\n    )\n    .slice(0, 5)\n    .map(f =>\n      `${f.Key} (${f.latencyMs} ms)`\n    )\n    .join(\"<br>\");\n\n// ==========================================\n// ERROR BREAKDOWN\n// ==========================================\n\nconst errorBreakdown = {};\n\nfor (const f of processedLogs) {\n  if (f.error && typeof f.error === \"string\" && f.error.trim() !== \"\") {\n    errorBreakdown[f.error] =\n      (errorBreakdown[f.error] || 0) + 1;\n  }\n}\n\nconst formattedErrors =\n  Object.keys(errorBreakdown).length\n    ? Object.entries(errorBreakdown)\n        .map(([k, v]) => `<li>${k}: ${v}</li>`)\n        .join(\"\")\n    : \"<li>No errors recorded</li>\";\n\n// ==========================================\n// FAILED FILES CSV\n// ==========================================\n\nconst failedFiles =\n  uniqueLogs\n    .filter(f => f.status === \"FAILED\")\n    .map(f => f.Key);\n\nconst csvContent =\n  `Key\\n${failedFiles.length ? failedFiles.join(\"\\n\") : \"No failed files\"}`;\n\nconst binaryData =\n  Buffer.from(csvContent, \"utf8\").toString(\"base64\");\n\n// ==========================================\n// EMAIL BODY\n// ==========================================\n\nconst runTimestamp =\n  new Date().toLocaleString(\"en-IN\", {\n    timeZone: \"Asia/Kolkata\",\n  });\n\nconst emailBody = `\n<html>\n<body style=\"font-family:Arial;background:#f4f6f8;padding:20px;\">\n<div style=\"background:#ffffff;padding:20px;border-radius:8px;border:1px solid #ddd;max-width:700px;\">\n<h2 style=\"color:#2c3e50;\">IntelliExtract Processing Report</h2>\n\n<p><b>Run Time:</b> ${runTimestamp}</p>\n\n<table style=\"width:100%;border-collapse:collapse;\">\n<tr><td><b>Total Files</b></td><td>${totalFiles}</td></tr>\n<tr><td style=\"color:green;\"><b>Successful</b></td><td style=\"color:green;\">${successCount}</td></tr>\n<tr><td style=\"color:red;\"><b>Failed</b></td><td style=\"color:red;\">${failureCount}</td></tr>\n<tr><td><b>Yet To Be Processed</b></td><td>${yettobeProcessed}</td></tr>\n<tr><td><b>Average Latency</b></td><td>${Math.round(avgLatencyMs)} ms</td></tr>\n<tr><td><b>P95 Latency</b></td><td>${Math.round(p95LatencyMs)} ms</td></tr>\n<tr><td><b>Throughput</b></td><td>${throughputPerMinute} files/min</td></tr>\n<tr><td><b>Run Duration</b></td><td>${Math.round(runDurationMs / 1000)} sec</td></tr>\n</table>\n\n<br>\n\n<h4 style=\"color:#F4BB44;\">Slowest Files</h4>\n<p style=\"color:#F4BB44;\">${slowestFiles || \"None\"}</p>\n\n<h4>Error Breakdown</h4>\n<ul>${formattedErrors}</ul>\n\n<p style=\"color:red;\"><b>*Please find the attached CSV for Failed Files*</b></p>\n\n<hr>\n<p style=\"font-size:12px;color:#888;\">This email was sent automatically via n8n</p>\n</div>\n</body>\n</html>\n`;\n\n// ==========================================\n// FINAL RETURN\n// ==========================================\n\nreturn [\n  {\n    json: {\n      subject: `IntelliExtract Report - ${runTimestamp}`,\n      body: emailBody,\n      metrics: {\n        totalFiles,\n        successCount,\n        failureCount,\n        yettobeProcessed,\n        avgLatencyMs,\n        p95LatencyMs,\n        throughputPerMinute,\n        runDurationMs,\n      },\n    },\n    binary: {\n      data: {\n        data: binaryData,\n        mimeType: \"text/csv\",\n        fileName: \"failed_files.csv\",\n      },\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        304
+      ],
+      "id": "57ea76b4-a2a1-4a35-8522-56791858d44e",
+      "name": "SendMail Configuration JavaScript1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "=30 9 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -832,
+        304
+      ],
+      "id": "c181cbdb-d738-43e0-9db7-d33478378f35",
+      "name": "Schedule Trigger",
+      "alwaysOutputData": true,
+      "executeOnce": false
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Files/Batch Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Download a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download a file": {
+      "main": [
+        [
+          {
+            "node": "httpStartTime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "httpStartTime": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Files/Batch Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search a bucket1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Files/Batch Settings": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) from sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) from sheet1": {
+      "main": [
+        [
+          {
+            "node": "Condition check-JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Condition check-JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "SendMail Configuration JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SendMail Configuration JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1
+  },
+  "versionId": "9a4b06b4-884e-40cc-9f87-6c236fd4f3d1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "184120244125fe5395a07a74e2a7168aa686e8fbc7c9dd16be7c1136d1121e6b"
+  },
+  "id": "262VsmXznC0JK0YB",
+  "tags": []
+}

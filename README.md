@@ -12,7 +12,7 @@ Fetch Files from S3 — Retrieves file metadata from a specified AWS S3 bucket.
 
 Download Files — Downloads files for further processing.
 
-Submit to External API — Calls an HTTP API to upload/extract data.
+Submit to External API (IDP) — Calls an HTTP API to upload/extract data.
 
 Write Results — Results are appended or updated to a Google Sheet.
 
